@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="en">
 
 <head>
@@ -2101,6 +2101,36 @@
           localStorage.setItem('triadforgeWelcomeSeen', 'true');
         };
 
+document.getElementById("aiPasteLoadBtn").addEventListener("click", function() {
+  const input = document.getElementById("aiPasteLoadInput");
+  const value = input.value.trim();
+  if (!value) {
+    alert("Paste TriadForge save JSON first.");
+    return;
+  }
+  try {
+    // Try to parse as JSON (if it's not already an object)
+    let data = value;
+    if (typeof data === "string") {
+      // Some agents may double-JSON-stringify, so try to parse twice if needed
+      try { data = JSON.parse(data); } catch {}
+      if (typeof data === "string") data = JSON.parse(data);
+    }
+    // Use the same function as file load!
+    if (typeof loadTriadStateFromData === "function") {
+      loadTriadStateFromData(data);
+    } else if (typeof loadTriadState === "function") {
+      loadTriadState(data);
+    }
+    input.value = "";
+    showFeedbackMessage("Loaded TriadForge state from pasted text!", "success");
+    checkPrestigeUnlockCondition();
+    updatePrestigeProgressBar();
+  } catch (e) {
+    alert("Failed to parse TriadForge save JSON. Error: " + e.message);
+  }
+});
+
 
     });
   </script>
@@ -2239,6 +2269,25 @@
       ⚙️ BUILD DEPLOYMENTS
     </button>
   </div>
+</div>
+
+<div class="flex items-center space-x-2 mt-2" style="max-width:320px;">
+  <input
+    id="aiPasteLoadInput"
+    type="text"
+    autocomplete="off"
+    spellcheck="false"
+    placeholder="(For AI use)"
+    class="bg-gray-800 text-xs text-gray-200 p-1 rounded border border-gray-700"
+    style="width:180px; min-width:0; max-width:180px; font-size:0.95em; white-space:nowrap; overflow:hidden;"
+  />
+  <button
+    id="aiPasteLoadBtn"
+    class="bg-purple-600 hover:bg-purple-700 text-xs px-3 py-1 rounded"
+    style="font-size:0.98em;"
+    title="Load from pasted JSON (for AI/browser agents)">
+    Load
+  </button>
 </div>
 
  
